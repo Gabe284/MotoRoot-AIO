@@ -1,0 +1,31 @@
+# Build output
+build/
+out/
+target/
+dist/
+
+# IDE and local state
+.idea/
+.vscode/
+*.iml
+.local/
+.env
+.env.*
+
+# Signing material and local secrets
+*.jks
+*.keystore
+*.p12
+*.pem
+*.key
+
+# OS/editor artifacts
+.DS_Store
+Thumbs.db
+*~
+*.swp
+*.swo
+
+# Test and coverage output
+coverage/
+test-results/
