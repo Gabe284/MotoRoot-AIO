@@ -13,8 +13,9 @@ import java.util.concurrent.TimeUnit
  */
 internal object RootAudit {
     private const val TIMEOUT_SECONDS = 20L
+    private const val MAX_OUTPUT_CHARS = 96_000
 
-    private val auditScript = """
+    internal val auditScript = """
         echo '=== ROOT SESSION ==='
         id
         echo '=== DEVICE ==='
@@ -27,7 +28,7 @@ internal object RootAudit {
         printf 'kernel='; uname -r
         printf 'selinux='; getenforce 2>/dev/null
         echo '=== ROOT PROVIDER HINTS ==='
-        if [ -d /data/adb/ksu ]; then echo 'kernelSU_data_dir=present'; else echo 'kernelSU_data_dir=absent'; fi
+        if [ -d /data/adb/ksu ]; then echo 'kernelsu_data_dir=present'; else echo 'kernelsu_data_dir=absent'; fi
         if [ -d /data/adb/modules ]; then echo 'module_dir=present'; else echo 'module_dir=absent'; fi
         if pm list packages 2>/dev/null | grep -Fq 'com.rifsxd.ksunext'; then
           echo 'ksu_next_manager_package=present'
@@ -37,15 +38,15 @@ internal object RootAudit {
         echo '=== ROOT MODULE INVENTORY (READ-ONLY) ==='
         if [ -d /data/adb/modules ]; then
           for d in /data/adb/modules/*; do
-            [ -d "$d" ] || continue
-            [ -f "$d/module.prop" ] || continue
-            module_id=${d##*/}
-            module_name=$(sed -n 's/^name=//p' "$d/module.prop" | head -n 1)
-            module_version=$(sed -n 's/^version=//p' "$d/module.prop" | head -n 1)
+            [ -d "${'$'}d" ] || continue
+            [ -f "${'$'}d/module.prop" ] || continue
+            module_id=${'$'}{d##*/}
+            module_name=${'$'}(sed -n 's/^name=//p' "${'$'}d/module.prop" | head -n 1)
+            module_version=${'$'}(sed -n 's/^version=//p' "${'$'}d/module.prop" | head -n 1)
             module_state=enabled
-            [ -e "$d/disable" ] && module_state=disabled
-            [ -e "$d/remove" ] && module_state=remove-marked
-            printf '%s | %s | %s | %s\n' "$module_id" "$module_name" "$module_version" "$module_state"
+            [ -e "${'$'}d/disable" ] && module_state=disabled
+            [ -e "${'$'}d/remove" ] && module_state=remove-marked
+            printf '%s | %s | %s | %s\n' "${'$'}module_id" "${'$'}module_name" "${'$'}module_version" "${'$'}module_state"
           done
         else
           echo 'Module directory unavailable to this root session.'
@@ -58,14 +59,13 @@ internal object RootAudit {
             .redirectErrorStream(true)
             .start()
 
-        val readerThread = Thread.currentThread()
         val output = StringBuilder()
         val reader = Thread {
             BufferedReader(InputStreamReader(process.inputStream)).use { stream ->
-                var line: String?
-                while (stream.readLine().also { line = it } != null) {
+                while (true) {
+                    val line = stream.readLine() ?: break
                     synchronized(output) {
-                        if (output.length < 96_000) {
+                        if (output.length < MAX_OUTPUT_CHARS) {
                             output.append(line).append('\n')
                         }
                     }
