@@ -4,7 +4,7 @@ An all-in-one Android root management and customization toolkit, initially devel
 
 The goal is to bring device-aware root capability reporting, module inventory and conflict analysis, reversible system customization, font and emoji management, diagnostics, and carefully bounded performance controls into one configurable interface.
 
-> **Status: planning and foundation.** This repository does not yet contain a functional Android app, root service, installer, or device-modification scripts. No feature should be considered implemented until its code and tests are present.
+> **Status: planning and foundation.** This repository now contains a minimal native Android app and a first-pass read-only audit screen. The build and device behavior are still under validation; there is no installer or device-modification feature. No feature should be considered implemented until its code and tests are present.
 
 ## Initial goals
 
@@ -40,9 +40,9 @@ See [Device Support](docs/DEVICE_SUPPORT.md), [Architecture](docs/ARCHITECTURE.m
 
 ```text
 docs/                 Architecture, device support, security, porting plan
+app/                  Native Android application (Kotlin; early skeleton)
 core/                 Root-provider and device-capability abstractions (planned)
 features/              Module manager, fonts, emoji, performance, diagnostics (planned)
-ui/                    Unified configuration interface (planned)
 tests/                 Unit, integration, and device validation (planned)
 LICENSES/              Third-party notices and license records
 ```
