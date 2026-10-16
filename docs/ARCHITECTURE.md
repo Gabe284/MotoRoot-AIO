@@ -6,8 +6,10 @@ MotoRoot AIO is a device-aware root management and customization frontend, not a
 
 ## Layered design
 
-### 1. User interface
-- Presents provider status, device facts, module inventory, feature configuration, conflicts, plans, logs, and rollback status.
+### 1. Native Android user interface
+- The initial app is a native Kotlin Android application.
+- The current screen exposes a manually triggered read-only audit; it is an early skeleton, not a complete management UI.
+- The planned interface will present provider status, device facts, module inventory, feature configuration, conflicts, plans, logs, and rollback status.
 - Separates discovery from apply actions.
 - Shows the exact targets and operations before a privileged change.
 - Does not infer success from a command being launched; it verifies the resulting state.
@@ -20,7 +22,9 @@ MotoRoot AIO is a device-aware root management and customization frontend, not a
 - Refuses unsupported, ambiguous, or untrusted targets.
 
 ### 3. Root-provider adapter
-- Initially detects and integrates with KernelSU Next using documented/supported interfaces.
+- The initial audit uses the conventional `su -c` entry point with a fixed, source-defined, read-only script.
+- KernelSU Next is the primary target, but the app must not assume that the presence of `su` proves a particular provider.
+- Provider detection must report evidence and uncertainty, and use documented/supported interfaces where available.
 - Reports capabilities rather than assuming that root access implies every operation is supported.
 - Keeps provider-specific implementation out of feature modules.
 - Must not weaken root-provider authentication or silently change provider configuration.
@@ -88,7 +92,7 @@ Rollback cannot be promised for an operation until its recovery mechanism is imp
 
 ## Technology selection
 
-Choose the application language, UI framework, and build system only after inspecting current ZeroMount and KernelSU Next interfaces, Android 16 compatibility requirements, and available build/test tooling. Do not select a framework solely because it is already used by one upstream component.
+The initial app uses Kotlin, Android's native Activity/UI APIs, Android SDK 36, and JDK 17. This keeps the first prototype small and avoids importing ZeroMount's full WebUI or root orchestration engine. The project may adopt a richer UI framework later if it materially improves maintainability. The build is configured for a debug APK and a read-only unit-test suite; CI status is the source of truth for whether a given revision compiles.
 
 ## Non-goals for the first milestone
 
