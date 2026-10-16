@@ -6,6 +6,26 @@ The goal is to bring device-aware root capability reporting, module inventory an
 
 > **Status: planning and foundation.** This repository now contains a minimal native Android app and a first-pass read-only audit screen. The build and device behavior are still under validation; there is no installer or device-modification feature. No feature should be considered implemented until its code and tests are present.
 
+## Build APKs
+
+GitHub Actions provides a simple build route:
+
+1. Open [Actions → Android build](https://github.com/Gabe284/MotoRoot-AIO/actions/workflows/android-build.yml).
+2. Select **Run workflow** on the development branch.
+3. Choose **debug**, **release**, or **both** under **APK variant to build**.
+4. Open the completed run and download the corresponding artifact.
+
+Pushes to `main` or `feature/**` and pull requests targeting `main` run unit tests and build the debug APK automatically. A manually requested release build currently produces an **unsigned release APK**; it is for build validation, not a signed public release. Signing will be added only when a deliberate release-signing process is configured.
+
+For a local build with JDK 17, Android SDK 36, and Gradle 8.13 installed:
+
+```sh
+gradle --no-daemon testDebugUnitTest assembleDebug
+gradle --no-daemon assembleRelease
+```
+
+The debug variant uses application ID `dev.motoroot.aio.debug`; the release variant uses `dev.motoroot.aio`. Both are currently unminified.
+
 ## Initial goals
 
 - Start with a read-only device and root capability audit.
